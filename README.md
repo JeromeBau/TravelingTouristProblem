@@ -32,5 +32,17 @@ t.define_problem(['Barcelona', 'Belgrade', 'Berlin', 'Brussels', 'Bucharest', 'B
 ```
 which are written either in English or in the language of the country. 
 
-Using geopy, I collect the latitudes and longitudes and calculate the distance between the cities using Vincenty distance (appropriate distance for points on a sphere).
+Using geopy, I collect the latitudes and longitudes and calculate the distance between the cities using Vincenty distance (appropriate distance for points on a sphere). These are saved in self.distances and self.latlong respectively.
+
+```
+t.make_distances()
+t.make_latlong()
+```
+
+Alternatively, these matrices can also be saved and loaded directly from file
+
+```
+t.make_distances(load_from_file='distance_matrix.csv')
+t.make_latlong(load_from_file='latlong_matrix.csv')
+```
  

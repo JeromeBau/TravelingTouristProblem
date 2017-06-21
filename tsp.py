@@ -12,7 +12,7 @@ import time
 import matplotlib.pyplot as plt
 from geopy.geocoders import Nominatim
 from geopy.distance import vincenty
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 
 class TravelingTourist(object):
@@ -28,7 +28,6 @@ class TravelingTourist(object):
         self.trip_neighbor = None
         self.state_evolution = []
         self.distances = None
-        self.distances_path = '/home/jjb/Dropbox/Programming/SimulatedAnnealing/TSP/distance_matrix.csv'
         self.latlong = None
 
     def define_problem(self, cities, round_trip=True, shuffle=False):
@@ -41,16 +40,6 @@ class TravelingTourist(object):
             self.trip = cities
             if shuffle:
                 random.shuffle(self.trip)
-
-    def initiate_distances(self, load_from_file=None):
-        if load_from_file:
-            self.distances = pd.read_csv(load_from_file)
-        if self.distances is None:
-            distances = pd.DataFrame(np.zeros([len(self.trip), len(self.trip)]))
-            distances = distances.replace(0, -1)
-            distances.columns = self.trip
-            distances.index = self.trip
-            self.distances = distances
 
     @staticmethod
     def retrieve_latlong_for_city(city):
@@ -70,41 +59,49 @@ class TravelingTourist(object):
         if unit == 'miles':
             return vincenty(c1.point, c2.point).miles
 
-    def make_latlong(self):
+    def make_latlong(self, load_from_file=None):
         """ Generate a data frame containing the previously defined cities with their respective longitude
         and latitude
         """
-        assert self.trip is not None, 'The problem has not been defined. Run define_problem().'
-        latlong = pd.DataFrame(self.trip)
-        latlong[1] = latlong[0].apply(t.retrieve_latlong_for_city)
-        latlong[['Longitude', 'Latitude']] = pd.DataFrame([x for x in latlong[1]])
-        latlong.index = latlong[0]
-        del latlong[0]
-        del latlong[1]
-        self.latlong = latlong
+        if load_from_file:
+            self.distances = pd.read_csv(load_from_file)
+        else:
+            assert self.trip is not None, 'The problem has not been defined. Run define_problem().'
+            latlong = pd.DataFrame(self.trip)
+            latlong[1] = latlong[0].apply(t.retrieve_latlong_for_city)
+            latlong[['Longitude', 'Latitude']] = pd.DataFrame([x for x in latlong[1]])
+            latlong.index = latlong[0]
+            del latlong[0]
+            del latlong[1]
+            self.latlong = latlong
 
-    def make_distances(self, load_from_file=None, save=False):
-        assert self.trip is not None, 'The problem has not been defined. Run define_problem().'
-        self.initiate_distances(load_from_file)
-        for city in self.trip:
-            self.distances.loc[city].loc[city] = 0
-        for city_tuple in itertools.combinations(self.trip, 2):
-            logging.debug(city_tuple)
-            if self.distances.loc[city_tuple[0]].loc[city_tuple[1]] < 0 \
-                    or self.distances.loc[city_tuple[1]].loc[city_tuple[0]] < 0:
-                try:
-                    dist = self.retrieve_distance_between_cities(city_tuple[0], city_tuple[1])
-                except GeocoderUnavailable:
-                    logging.warning('Geopy Geocoder was not available.')
-                    dist = np.nan
-                except HTTPError:
-                    logging.warning('Too many requests for Geopy. Waiting a few seconds')
-                    time.sleep(30)
-                    dist = np.nan
-                self.distances.loc[city_tuple[0]].loc[city_tuple[1]] = dist
-                self.distances.loc[city_tuple[1]].loc[city_tuple[0]] = dist
-        if save:
-            self.distances
+    def make_distances(self, load_from_file=None):
+        if load_from_file:
+            self.distances = pd.read_csv(load_from_file)
+        else:
+            assert self.trip is not None, 'The problem has not been defined. Run define_problem().'
+            distances = pd.DataFrame(np.zeros([len(self.trip), len(self.trip)]))
+            distances = distances.replace(0, -1)
+            distances.columns = self.trip
+            distances.index = self.trip
+            self.distances = distances
+            for city in self.trip:
+                self.distances.loc[city].loc[city] = 0
+            for city_tuple in itertools.combinations(self.trip, 2):
+                logging.debug(city_tuple)
+                if self.distances.loc[city_tuple[0]].loc[city_tuple[1]] < 0 \
+                        or self.distances.loc[city_tuple[1]].loc[city_tuple[0]] < 0:
+                    try:
+                        dist = self.retrieve_distance_between_cities(city_tuple[0], city_tuple[1])
+                    except GeocoderUnavailable:
+                        logging.warning('Geopy Geocoder was not available.')
+                        dist = np.nan
+                    except HTTPError:
+                        logging.warning('Too many requests for Geopy. Waiting a few seconds')
+                        time.sleep(30)
+                        dist = np.nan
+                    self.distances.loc[city_tuple[0]].loc[city_tuple[1]] = dist
+                    self.distances.loc[city_tuple[1]].loc[city_tuple[0]] = dist
 
     def energy(self, trip):
         """ Energy function of the annealing progress
@@ -155,9 +152,6 @@ class TravelingTourist(object):
     # VISUALIZATION
     def visualize_one_state(self, state):
         """ Draw one state as map"""
-        # img = imread("/home/jjb/Desktop/europe_small.png")
-        # plt.xlim(-30, 60)
-        # plt.ylim(35, 65)
         if self.latlong is None:
             self.make_latlong()
         # City grid
@@ -178,7 +172,7 @@ class TravelingTourist(object):
                  [self.latlong.loc[city1].loc['Latitude'], self.latlong.loc[city2].loc['Latitude']])
         return plt
 
-    def visualize_all_states(self, folder='/home/jjb/Desktop/animtsp/'):
+    def visualize_all_states(self, folder=''):
         """ Save all different states as png"""
         i = 0
         for state in self.state_evolution:
@@ -192,26 +186,5 @@ class TravelingTourist(object):
         y_lab = self.latlong.loc[city].loc['Lat'] + 0.5
         return plt.annotate(city, xy=(x_lab, y_lab), xytext=(x_lab, y_lab))
 
-t = TravelingTourist()
-t.define_problem(['Barcelona', 'Belgrade', 'Berlin', 'Brussels', 'Bucharest', 'Budapest', 'Copenhagen', 'Dublin',
-                  'Paris', 'Lisbon', 'Madrid', 'Cologne', 'Bern', 'Amsterdam', 'London', 'Manchester', 'Oslo',
-                  'Rome', 'Sicily', 'Montpellier', 'Zurich', 'Vienna', 'Athina'])
 
 
-# s.anneal()
-# s.visualize_one_state(s.trip)
-#
-#
-# plt.show()
-
-
-
-# TODO Create a dataframe with distances for all cities
-# TODO What happens when a city is not found?
-
-
-i = 0
-for state in t.state_evolution:
-    plt = t.visualize_one_state(state)
-    plt.savefig(folder + 'tsp_' + str(i))
-    i += 1
