@@ -60,3 +60,8 @@ and its results are returned or can alternatively be viewed calling
 t.trip
 ```
 
+All states considered during the algorithm remain in 
+
+```
+t.state_evolution
+```

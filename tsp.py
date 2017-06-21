@@ -185,17 +185,3 @@ class TravelingTourist(object):
         x_lab = self.latlong.loc[city].loc['Long'] + 0.5
         y_lab = self.latlong.loc[city].loc['Lat'] + 0.5
         return plt.annotate(city, xy=(x_lab, y_lab), xytext=(x_lab, y_lab))
-
-
-
-t = TravelingTourist()
-t.define_problem(['Barcelona', 'Belgrade', 'Berlin', 'Brussels', 'Bucharest', 'Budapest', 'Copenhagen', 'Dublin',
-                  'Paris', 'Lisbon', 'Madrid', 'Cologne', 'Bern', 'Amsterdam', 'London', 'Manchester', 'Oslo',
-                  'Rome', 'Sicily', 'Montpellier', 'Zurich', 'Vienna', 'Athina'])
-
-
-# s.anneal()
-# s.visualize_one_state(s.trip)
-#
-#
-# plt.show()
