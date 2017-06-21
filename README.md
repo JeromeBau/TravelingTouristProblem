@@ -1,6 +1,6 @@
 # TravelingTouristProblem
 
-The goal of this repository is to apply Simulated Annealing to a *Traveling Salesman Problem*. Given a set of cities in Europe, the algorithm determines a near optimal route using Simulated Annealing.
+The goal of this repository is to apply Simulated Annealing to a *Traveling Salesman Problem*. Given a set of cities in Europe, the algorithm determines an approximately optimal route using Simulated Annealing.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/JeromeBau/TravelingTouristProblem/master/animation.gif" alt='Simulated Annealing evolution of best journey estiamte'/>
@@ -45,4 +45,18 @@ Alternatively, these matrices can also be saved and loaded directly from file
 t.make_distances(load_from_file='distance_matrix.csv')
 t.make_latlong(load_from_file='latlong_matrix.csv')
 ```
- 
+
+## Simulated Annealing
+
+The annealing method is executed with a simple
+
+```
+t.anneal()
+```
+
+and its results are returned or can alternatively be viewed calling 
+
+```
+t.trip
+```
+

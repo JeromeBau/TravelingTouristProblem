@@ -188,3 +188,14 @@ class TravelingTourist(object):
 
 
 
+t = TravelingTourist()
+t.define_problem(['Barcelona', 'Belgrade', 'Berlin', 'Brussels', 'Bucharest', 'Budapest', 'Copenhagen', 'Dublin',
+                  'Paris', 'Lisbon', 'Madrid', 'Cologne', 'Bern', 'Amsterdam', 'London', 'Manchester', 'Oslo',
+                  'Rome', 'Sicily', 'Montpellier', 'Zurich', 'Vienna', 'Athina'])
+
+
+# s.anneal()
+# s.visualize_one_state(s.trip)
+#
+#
+# plt.show()
