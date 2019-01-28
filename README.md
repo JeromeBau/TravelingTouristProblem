@@ -3,7 +3,7 @@
 The goal of this repository is to apply Simulated Annealing to a *Traveling Salesman Problem*. Given a set of cities in Europe, the algorithm determines an approximately optimal route using Simulated Annealing.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/JeromeBau/TravelingTouristProblem/master/animation.gif" alt='Simulated Annealing evolution of best journey estiamte'/>
+<img src="https://raw.githubusercontent.com/JeromeBau/TravelingTouristProblem/master/ttp_animation.gif" alt='Simulated Annealing evolution of best journey estiamte'/>
 </p>
 
 
