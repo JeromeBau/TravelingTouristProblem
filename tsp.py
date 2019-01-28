@@ -16,8 +16,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 
 
 class TravelingTourist(object):
-    """" Applies Simulated Annealing to a traveling salesman problem
-    """
+    """" Applies Simulated Annealing to a traveling salesman problem"""
     def __init__(self):
         self.temperature_initial = 1
         self.temperature_terminal = 0.0001
